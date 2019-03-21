@@ -39,8 +39,10 @@ void	server_core(SOCKET local_sock)
 				printf("file send\n");
 				close(client_sock);
 				client_sock = 0;
+				break;
 			}
 			printf("get != buffer\n");
+			break;
 		}
 	}
 }

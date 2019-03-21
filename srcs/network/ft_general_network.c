@@ -120,7 +120,7 @@ char	*recv_net(SOCKET socket)
 	char *buffer = NULL;
 	int bytes = 0;
 
-	buffer = calloc(6, sizeof(char));
+	buffer = calloc(14, sizeof(char));
 
 	printf("1: sizeof(buffer) = %ld\n", sizeof(buffer));
 
@@ -132,7 +132,7 @@ char	*recv_net(SOCKET socket)
 	else
 		//printf("recv size: %d bytes\n", bytes);
 	printf("recv size = |%s|\n", buffer);
-
+	printf("taille de buffer = %ld\n", strlen(buffer));
 	size = atoi(buffer);
 	printf("size = %d\n", size);
 	buffer = realloc(buffer, sizeof(char) * size);
