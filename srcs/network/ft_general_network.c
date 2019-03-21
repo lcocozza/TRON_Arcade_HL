@@ -27,15 +27,15 @@ int	sendfile_net(const char *path, const char *filename, SOCKET socket)
 
 	if (path != NULL)
 	{
-		file = malloc(sizeof(char) * (strlen(path) + strlen(filename) + 1));
-		bzero(file, strlen(path) + strlen(filename) + 1);
+		if ((file = calloc(strlen(path) + strlen(filename) + 1, sizeof(char))) == NULL)
+			return -1;
 		strcpy(file, path);
 		strcat(file, filename);
 	}
 	else
 	{
-		file = malloc(sizeof(char) * (strlen(filename) + 1));
-		bzero(file, strlen(filename) + 1);
+		if ((file = calloc(strlen(filename) + 1, sizeof(char))) == NULL)
+			return -1;
 		strcpy(file, filename);
 	}
 
@@ -67,15 +67,15 @@ int	recvfile_net(const char *path, SOCKET socket)
 
 	if (path != NULL)
 	{
-		file = malloc(sizeof(char) * (strlen(path) + strlen(filename) + 1));
-		bzero(file, strlen(path) + strlen(filename) + 1);
+		if ((file = calloc(strlen(path) + strlen(filename) + 1, sizeof(char))) == NULL)
+			return -1;
 		strcpy(file, path);
 		strcat(file, filename);
 	}
 	else
 	{
-		file = malloc(sizeof(char) * (strlen(filename) + 1));
-		bzero(file, strlen(filename) + 1);
+		if ((file = calloc(strlen(filename) + 1, sizeof(char))) == NULL)
+			return -1;
 		strcpy(file, filename);
 	}
 
@@ -101,7 +101,7 @@ int	recvfile_net(const char *path, SOCKET socket)
 
 int	send_net(SOCKET socket, const char *buffer)
 {
-	if (send(socket, ft_itoa(strlen(buffer) + 1), strlen(buffer) + 1, 0) == -1)
+	if (send(socket, ft_itoa(strlen(buffer) + 1), strlen(ft_itoa(strlen(buffer))) + 1, 0) == -1)
 	{
 		perror("send size");
 		return -1;
@@ -122,26 +122,32 @@ char	*recv_net(SOCKET socket)
 
 	buffer = calloc(6, sizeof(char));
 
-	if ((bytes = recv(socket, buffer, sizeof(buffer), 0)) == -1)
+	printf("1: sizeof(buffer) = %ld\n", sizeof(buffer));
+
+	if ((bytes = recv(socket, buffer, 6, 0)) == -1)
 	{
 		perror("recv size");
 		return NULL;
 	}
 	else
-		printf("recv size: %d bytes\n", bytes);
+		//printf("recv size: %d bytes\n", bytes);
 	printf("recv size = |%s|\n", buffer);
 
 	size = atoi(buffer);
+	printf("size = %d\n", size);
 	buffer = realloc(buffer, sizeof(char) * size);
 	bzero(buffer, size);
+	
+	printf("2: sizeof(buffer) = %ld\n", sizeof(buffer));
 
-	if ((bytes = recv(socket, buffer, sizeof(buffer), 0)) == -1)
+	if ((bytes = recv(socket, buffer, sizeof(char) * size, 0)) == -1)
 	{
 		perror("recv buffer");
 		return NULL;
 	}
 	else
-		printf("recv buffer: %d bytes\n", bytes);
+	//	printf("recv buffer: %d bytes\n", bytes);
 	printf("recv buffer = |%s|\n", buffer);
+	printf("=======================================\n");
 	return buffer;
 }

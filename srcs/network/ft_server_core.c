@@ -35,7 +35,7 @@ void	server_core(SOCKET local_sock)
 			if (strcmp(get, buffer) == 0)
 			{
 				printf("get = buffer\n");
-				sendfile_net("srcs/network/", ".host_list.tron", client_sock);
+				//sendfile_net("srcs/network/", ".host_list.tron", client_sock);
 				printf("file send\n");
 				close(client_sock);
 				client_sock = 0;
