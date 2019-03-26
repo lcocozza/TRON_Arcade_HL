@@ -16,7 +16,6 @@ char	*ft_itoa(int n);
 /*ft_general_network.c*/
 int	init_server(void);
 int	sendfile_net(const char *path, const char *filename, SOCKET socket);
-int	recvfile_net(const char *path, SOCKET socket);
 int	send_net(SOCKET socket, const char *buffer);
 char	*recv_net(SOCKET socket);
 /*ft_server_core.c*/

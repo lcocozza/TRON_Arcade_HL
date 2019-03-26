@@ -28,20 +28,16 @@ void	server_core(SOCKET local_sock)
 		}
 		else if (FD_ISSET(client_sock, &readfs))
 		{
-			printf("start recv_net\n");
 			buffer = recv_net(client_sock);
-			printf("end recv_net\n");
-			printf("buffer = |%s|\n", buffer);
 			if (strcmp(get, buffer) == 0)
 			{
-				printf("get = buffer\n");
-				//sendfile_net("srcs/network/", ".host_list.tron", client_sock);
-				printf("file send\n");
+				sendfile_net("srcs/network/", ".host_list.tron", client_sock);
 				close(client_sock);
 				client_sock = 0;
 				break;
 			}
 			printf("get != buffer\n");
+			close(client_sock);
 			break;
 		}
 	}

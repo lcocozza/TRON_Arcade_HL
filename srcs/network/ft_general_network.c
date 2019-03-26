@@ -7,7 +7,7 @@ int	init_server(void)
 
 	if ((local_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		return -1;
-	
+
 	local_in.sin_addr.s_addr = htonl(INADDR_ANY);
 	local_in.sin_port = htons(HL_PORT);
 	local_in.sin_family = AF_INET;
@@ -24,7 +24,8 @@ int	sendfile_net(const char *path, const char *filename, SOCKET socket)
 	char *file = NULL;
 	char *buffer = NULL;
 	FILE *fd_file = NULL;
-
+	
+	buffer = malloc(sizeof(char) * 1);
 	if (path != NULL)
 	{
 		if ((file = calloc(strlen(path) + strlen(filename) + 1, sizeof(char))) == NULL)
@@ -56,51 +57,9 @@ int	sendfile_net(const char *path, const char *filename, SOCKET socket)
 	return 0;
 }
 
-int	recvfile_net(const char *path, SOCKET socket)
-{
-	char *file = NULL;
-	char *filename = NULL;
-	char *buffer = NULL;
-	FILE *fd_file = NULL;
-
-	filename = recv_net(socket);
-
-	if (path != NULL)
-	{
-		if ((file = calloc(strlen(path) + strlen(filename) + 1, sizeof(char))) == NULL)
-			return -1;
-		strcpy(file, path);
-		strcat(file, filename);
-	}
-	else
-	{
-		if ((file = calloc(strlen(filename) + 1, sizeof(char))) == NULL)
-			return -1;
-		strcpy(file, filename);
-	}
-
-	if ((fd_file = fopen(file, "w+")) == NULL)
-	{
-		free(file);
-		return -1;
-	}
-
-	while (strcmp(buffer, "EOF") != 0)
-	{
-		buffer = recv_net(socket);
-		if (strcmp(buffer, "EOF") != 0)
-			fputs(buffer, fd_file);
-	}
-
-	free(file);
-	free(filename);
-	free(buffer);
-	fclose(fd_file);
-	return 0;
-}
-
 int	send_net(SOCKET socket, const char *buffer)
 {
+	printf("buffer send = %s\n", buffer);
 	if (send(socket, ft_itoa(strlen(buffer) + 1), strlen(ft_itoa(strlen(buffer))) + 1, 0) == -1)
 	{
 		perror("send size");
@@ -119,35 +78,36 @@ char	*recv_net(SOCKET socket)
 	unsigned int size;
 	char *buffer = NULL;
 	int bytes = 0;
+	char c;
+	int i = 0;
 
-	buffer = calloc(14, sizeof(char));
+	buffer = calloc(6, sizeof(char));
 
-	printf("1: sizeof(buffer) = %ld\n", sizeof(buffer));
-
-	if ((bytes = recv(socket, buffer, 6, 0)) == -1)
+	do 
 	{
-		perror("recv size");
-		return NULL;
-	}
-	else
-		//printf("recv size: %d bytes\n", bytes);
-	printf("recv size = |%s|\n", buffer);
-	printf("taille de buffer = %ld\n", strlen(buffer));
+		bytes = recv(socket, &c, 1, MSG_WAITALL);
+		if (bytes == -1)
+		{
+			perror("recv size");
+			return NULL;
+		}
+		buffer[i++] = c;
+	} while (c != 0);
+
 	size = atoi(buffer);
-	printf("size = %d\n", size);
 	buffer = realloc(buffer, sizeof(char) * size);
 	bzero(buffer, size);
-	
-	printf("2: sizeof(buffer) = %ld\n", sizeof(buffer));
 
-	if ((bytes = recv(socket, buffer, sizeof(char) * size, 0)) == -1)
+	i = 0;
+	do
 	{
-		perror("recv buffer");
-		return NULL;
-	}
-	else
-	//	printf("recv buffer: %d bytes\n", bytes);
-	printf("recv buffer = |%s|\n", buffer);
-	printf("=======================================\n");
+		bytes = recv(socket, &c, 1, MSG_WAITALL);
+		if (bytes == -1)
+		{
+			perror("recv buffer");
+			return NULL;
+		}
+		buffer[i++] = c;
+	} while (c != 0);
 	return buffer;
 }
